@@ -18,7 +18,7 @@ function player(name, symbol) {
   return { name, symbol };
 }
 
-// Make 2 players for testing
+// Create 2 players for testing
 const player1 = player("Player 1", "X");
 const player2 = player("Player 2", "O");
 const players = [player1, player2];
@@ -64,3 +64,53 @@ function gameController() {
     }
 return { makeMove, getBoard };
 }
+
+// Render the game board in the DOM
+function renderBoard(size) {
+    const gameBoardDiv = document.getElementById("game-board");
+    gameBoardDiv.innerHTML = ""; // Clear previous board
+
+    for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.row = i;
+        cell.dataset.col = j;
+        cell.textContent = board[i][j] || "";
+        gameBoardDiv.appendChild(cell);
+    } 
+    }
+}
+
+// Initialize game controller and render the board
+const controller = gameController();
+renderBoard(size);
+
+// Add event listener for cell clicks
+document.getElementById("game-board").addEventListener("click", (event) => {
+    if (event.target.classList.contains("cell")) {
+    const row = parseInt(event.target.dataset.row);
+    const col = parseInt(event.target.dataset.col);
+    try {
+        const result = controller.makeMove(row, col);
+        renderBoard(size);
+        if (result !== "Move accepted.") {
+        alert(result);
+        }
+    } catch (error) {
+        alert(error.message);
+    }
+    }
+});
+
+// Add event listener for Reset Game button
+document.getElementById("reset-button").addEventListener("click", () => {
+    // Reset the board
+    for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
+        board[i][j] = null;
+    }
+    }
+    renderBoard(size);
+}); 
+
