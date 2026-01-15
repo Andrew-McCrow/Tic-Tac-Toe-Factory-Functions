@@ -1,9 +1,13 @@
+
+let controller; // Declare controller in the outer scope
+const BOARD_SIZE = 3;
+
 // Factory function to create a 3x3 game board
 function gameBoard() {
   const board = [];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < BOARD_SIZE; i++) {
     board.push([]);
-    for (let j = 0; j < 3; j++) {
+    for (let j = 0; j < BOARD_SIZE; j++) {
       board[i].push(null);
     }
   }
@@ -60,7 +64,7 @@ function gameController(player1Name, player2Name) {
             if (checkWin(row, col, currentPlayer.symbol)) {
                 return `${currentPlayer.name} wins!`;
             }
-            if (movesCount === 3 * 3) {
+            if (movesCount === BOARD_SIZE * BOARD_SIZE) {
                 return "It's a draw!";
             }
         currentPlayerIndex = 1 - currentPlayerIndex; // Switch player
@@ -75,14 +79,14 @@ function gameController(player1Name, player2Name) {
         if (board.every(r => r[col] === symbol)) return true;
         // Check diagonals
         if (row === col && board.every((r, i) => r[i] === symbol)) return true;
-        if (row + col === 3 - 1 && board.every((r, i) => r[3 - 1 - i] === symbol)) return true;
+        if (row + col === BOARD_SIZE - 1 && board.every((r, i) => r[BOARD_SIZE - 1 - i] === symbol)) return true;
     return false;
     }
 
     // Reset the game state
     function resetGame() {
-        for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
+        for (let i = 0; i < BOARD_SIZE; i++) {
+        for (let j = 0; j < BOARD_SIZE; j++) {
             board[i][j] = null;
         }
         }
@@ -90,7 +94,7 @@ function gameController(player1Name, player2Name) {
         movesCount = 0;
     }
 
-  return { getBoard, createPlayers, makeMove, resetGame };
+  return { getBoard, makeMove, resetGame };
 }
 
 // Add event listener for Start Game button
@@ -107,8 +111,8 @@ function renderBoard() {
     const gameBoardDiv = document.getElementById("game-board");
     gameBoardDiv.innerHTML = ""; // Clear previous board
 
-    for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
+    for (let i = 0; i < BOARD_SIZE; i++) {
+    for (let j = 0; j < BOARD_SIZE; j++) {
         const cell = document.createElement("div");
         cell.classList.add("cell");
         cell.dataset.row = i;
@@ -121,9 +125,9 @@ function renderBoard() {
 
 // Add event listener for Reset Game button
 document.getElementById("reset-button").addEventListener("click", () => {
-    // Get player names again in case they were changed
-    players = getPlayerNames();
-    // Reset the board
+    // Get updated player names
+    controller = gameController(...getPlayerNames());
+    // Reset the game state
     controller.resetGame();
     // Re-render the board
     renderBoard();      
