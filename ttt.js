@@ -15,21 +15,31 @@ function player(name, symbol) {
   return { name, symbol };
 }
 
+// Get player names from input fields
+function getPlayerNames() { 
+    const name1Input = document.getElementById("player1-name");
+    const name2Input = document.getElementById("player2-name");
+    const name1 = name1Input ? name1Input.value.trim() : "Player 1";
+    const name2 = name2Input ? name2Input.value.trim() : "Player 2";
+    return [name1 || "Player 1", name2 || "Player 2"];
+}   
+
+
 // function to manage the game logic
-function gameController() {
+function gameController(player1Name, player2Name) {
     
     // Track current player and moves count
     let currentPlayerIndex = 0;
     let movesCount = 0;
 
-    // Get player names from input fields
-    const name1Input = document.getElementById("player1-name");
-    const name2Input = document.getElementById("player2-name");
-
     // Create 2 players
-    const player1 = player(name1Input.value, "X");
-    const player2 = player(name2Input.value, "O");
-    const players = [player1, player2];
+    function createPlayers(player1Name, player2Name) {  
+        const player1 = player(player1Name, "X");
+        const player2 = player(player2Name, "O");
+        const players = [player1, player2]; 
+        return players;
+    }
+    const players = createPlayers(player1Name, player2Name);
 
     // Create a 3x3 game board
     const { board } = gameBoard();
@@ -80,21 +90,15 @@ function gameController() {
         movesCount = 0;
     }
 
-  return { makeMove, getBoard, resetGame };
+  return { getBoard, createPlayers, makeMove, resetGame };
 }
 
 // Add event listener for Start Game button
 document.getElementById("start-button").addEventListener("click", () => {
-    const name1 = document.getElementById("player1-name").value.trim();
-    const name2 = document.getElementById("player2-name").value.trim();
-    
-    if (!name1 || !name2) {
-        alert("Please enter names for both players.");
-        return;
-    }
-    
+    const players = getPlayerNames();
+
     // Now create the controller with the entered names
-    controller = gameController();
+    controller = gameController(...players);
     renderBoard();
 }); 
 
@@ -117,6 +121,8 @@ function renderBoard() {
 
 // Add event listener for Reset Game button
 document.getElementById("reset-button").addEventListener("click", () => {
+    // Get player names again in case they were changed
+    players = getPlayerNames();
     // Reset the board
     controller.resetGame();
     // Re-render the board
