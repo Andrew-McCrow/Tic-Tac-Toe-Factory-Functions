@@ -1,4 +1,4 @@
-// Factory function to create a game board of given size
+// Factory function to create a 3x3 game board
 function gameBoard() {
   const board = [];
   for (let i = 0; i < 3; i++) {
@@ -18,6 +18,7 @@ function player(name, symbol) {
 // function to manage the game logic
 function gameController() {
     
+    // Track current player and moves count
     let currentPlayerIndex = 0;
     let movesCount = 0;
 
@@ -33,41 +34,57 @@ function gameController() {
     // Create a 3x3 game board
     const { board } = gameBoard();
 
+    // Function to get the current state of the board
+    function getBoard() {
+    return board;
+    }
+
     // Function to make a move on the board
     function makeMove(row, col) {
-    if (board[row][col] !== null) {
-        throw new Error("Cell is already occupied.");
-    }
-    const currentPlayer = players[currentPlayerIndex];
-    board[row][col] = currentPlayer.symbol;
-    movesCount++;
-    if (checkWin(row, col, currentPlayer.symbol)) {
-        return `${currentPlayer.name} wins!`;
-    }
-    if (movesCount === 3 * 3) {
-        return "It's a draw!";
-    }
-    currentPlayerIndex = 1 - currentPlayerIndex; // Switch player
-    return "Move accepted.";
+        if (board[row][col] !== null) {
+            throw new Error("Cell is already occupied.");
+        }
+        const currentPlayer = players[currentPlayerIndex];
+        board[row][col] = currentPlayer.symbol;
+        movesCount++;
+            if (checkWin(row, col, currentPlayer.symbol)) {
+                return `${currentPlayer.name} wins!`;
+            }
+            if (movesCount === 3 * 3) {
+                return "It's a draw!";
+            }
+        currentPlayerIndex = 1 - currentPlayerIndex; // Switch player
+        return "Move accepted.";
     }
 
     // Function to check if the current player has won
     function checkWin(row, col, symbol) {
     // Check row
-    if (board[row].every(cell => cell === symbol)) return true;
-    // Check column
-    if (board.every(r => r[col] === symbol)) return true;
-    // Check diagonals
-    if (row === col && board.every((r, i) => r[i] === symbol)) return true;
-    if (row + col === 3 - 1 && board.every((r, i) => r[3 - 1 - i] === symbol)) return true;
+        if (board[row].every(cell => cell === symbol)) return true;
+        // Check column
+        if (board.every(r => r[col] === symbol)) return true;
+        // Check diagonals
+        if (row === col && board.every((r, i) => r[i] === symbol)) return true;
+        if (row + col === 3 - 1 && board.every((r, i) => r[3 - 1 - i] === symbol)) return true;
     return false;
     }
 
-    function getBoard() {
-    return board;
+    // Reset the game state
+    function resetGame() {
+        for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            board[i][j] = null;
+        }
+        }
+        currentPlayerIndex = 0;
+        movesCount = 0;
     }
-return { makeMove, getBoard };
+
+  return { makeMove, getBoard, resetGame };
 }
+
+// Initialize the game controller
+const controller = gameController();
 
 // Render the game board in the DOM
 function renderBoard() {
@@ -91,18 +108,13 @@ document.getElementById("start-button").addEventListener("click", () => {
     renderBoard();
 }); 
 
-const controller = gameController();
-
 // Add event listener for Reset Game button
 document.getElementById("reset-button").addEventListener("click", () => {
     // Reset the board
-    for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
-        controller.getBoard()[i][j] = null;
-    }
-    }
-    renderBoard();
-}); 
+    controller.resetGame();
+    // Re-render the board
+    renderBoard();      
+    });
 
 // Add event listener for cell clicks
 document.getElementById("game-board").addEventListener("click", (event) => {
