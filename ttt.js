@@ -83,8 +83,20 @@ function gameController() {
   return { makeMove, getBoard, resetGame };
 }
 
-// Initialize the game controller
-const controller = gameController();
+// Add event listener for Start Game button
+document.getElementById("start-button").addEventListener("click", () => {
+    const name1 = document.getElementById("player1-name").value.trim();
+    const name2 = document.getElementById("player2-name").value.trim();
+    
+    if (!name1 || !name2) {
+        alert("Please enter names for both players.");
+        return;
+    }
+    
+    // Now create the controller with the entered names
+    controller = gameController();
+    renderBoard();
+}); 
 
 // Render the game board in the DOM
 function renderBoard() {
@@ -102,11 +114,6 @@ function renderBoard() {
     } 
     }
 }
-
-// Add event listener for Start Game button
-document.getElementById("start-button").addEventListener("click", () => {
-    renderBoard();
-}); 
 
 // Add event listener for Reset Game button
 document.getElementById("reset-button").addEventListener("click", () => {
